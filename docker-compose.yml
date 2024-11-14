@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+  react_app:
+    build:
+      context: ./react-app
+    container_name: social_media_react
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./react-app:/workspace
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - api
+      - db
+
+  api:
+    build:
+      context: ./api
+    container_name: social_media_api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/social_db
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: social_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    driver: local
